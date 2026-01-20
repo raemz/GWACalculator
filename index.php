@@ -142,7 +142,7 @@ if (isset($_POST['auto_save'])) {
     <div id="gwa-footer">
     
     <span id="gwa-text">GWA: —</span>
-    <img id="gwa-reaction" src="assets/reactions/kirbyReaction-10.png" alt="Reaction">
+    <img id="gwa-reaction" src="assets/picture/kirbyGwaReactions/kirbyReaction-1.png" alt="Reaction">
 </div>
 
 
@@ -258,3 +258,4 @@ if (isset($_POST['auto_save'])) {
 
 
 </html>
+
