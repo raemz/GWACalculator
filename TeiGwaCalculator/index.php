@@ -1,258 +1,259 @@
 <?php
 session_start();
 
-// Initialize courses
-if(!isset($_SESSION['courses'])){
+if (!isset($_SESSION['courses'])) {
     $_SESSION['courses'] = [];
 }
 
-// UP Grade Conversion
-function convertToUPGrade($percent){
-    if($percent>=97) return 1.00;
-    if($percent>=94.25) return 1.25;
-    if($percent>=91.50) return 1.50;
-    if($percent>=88.75) return 1.75;
-    if($percent>=86.00) return 2.00;
-    if($percent>=83.25) return 2.25;
-    if($percent>=80.50) return 2.50;
-    if($percent>=77.75) return 2.75;
-    if($percent>=75.00) return 3.00;
-    if($percent<75.00) return 4.00;
-    return 5.00;
+function convertToUPGrade($percent)
+{
+    if ($percent >= 97) return 1.00;
+    if ($percent >= 94.25) return 1.25;
+    if ($percent >= 91.50) return 1.50;
+    if ($percent >= 88.75) return 1.75;
+    if ($percent >= 86.00) return 2.00;
+    if ($percent >= 83.25) return 2.25;
+    if ($percent >= 80.50) return 2.50;
+    if ($percent >= 77.75) return 2.75;
+    if ($percent >= 75.00) return 3.00;
+    return 4.00;
 }
 
-// Add new course
-if(isset($_POST['add_course'])){
+if (isset($_POST['add_course'])) {
     $code = trim($_POST['course_code']);
-    if($code!==""){
+    if ($code !== "") {
         $_SESSION['courses'][] = [
-            'code'=>$code,
-            'activities'=>[],
-            'units'=>3
+            'code' => $code,
+            'activities' => [],
+            'units' => 3
         ];
     }
-    header("Location: ".$_SERVER['PHP_SELF']);
+    header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 
-// Remove course
-if(isset($_POST['remove_course'])){
-    $idx = $_POST['remove_course'];
-    if(isset($_SESSION['courses'][$idx])){
-        array_splice($_SESSION['courses'],$idx,1);
-    }
-    header("Location: ".$_SERVER['PHP_SELF']);
+if (isset($_POST['remove_course'])) {
+    array_splice($_SESSION['courses'], $_POST['remove_course'], 1);
+    header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 
-// Auto-save (live save from JS)
-if(isset($_POST['auto_save'])){
+if (isset($_POST['auto_save'])) {
     $idx = $_POST['course_index'];
     $activities = [];
-    if(isset($_POST['activity']) && is_array($_POST['activity'])){
-        for($i=0;$i<count($_POST['activity']);$i++){
-            if($_POST['activity'][$i]==='') continue;
+
+    if (isset($_POST['activity'])) {
+        foreach ($_POST['activity'] as $i => $name) {
+            if ($name === '') continue;
             $activities[] = [
-                'name'=>$_POST['activity'][$i],
-                'score'=>floatval($_POST['score'][$i] ?? 0),
-                'max'=>floatval($_POST['max'][$i] ?? 0),
-                'weight'=>floatval($_POST['weight'][$i] ?? 0)
+                'name' => $name,
+                'score' => floatval($_POST['score'][$i] ?? 0),
+                'max' => floatval($_POST['max'][$i] ?? 0),
+                'weight' => floatval($_POST['weight'][$i] ?? 0)
             ];
         }
     }
+
     $_SESSION['courses'][$idx]['activities'] = $activities;
     $_SESSION['courses'][$idx]['units'] = floatval($_POST['units'] ?? 3);
-    exit; // stop page reload
+    exit;
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>TeiGwaCalc</title>
-<style>
-body{font-family:Arial,sans-serif;padding:20px;}
-table{border-collapse:collapse;width:100%;margin-bottom:10px;}
-table,th,td{border:1px solid #ccc;}
-th,td{padding:6px;text-align:center;}
-.weight-warning{color:red;display:none;}
-.course-card{border:1px solid #aaa;padding:15px;margin-bottom:20px;position:relative;}
-button{margin-right:5px;}
-.remove-course-btn{position:absolute;top:10px;right:10px;}
-</style>
+    <meta charset="UTF-8">
+    <title>TeiGwaCalc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets\style.css">
+
 </head>
+
 <body>
 
-<h2>Tei's UP GWA Calculator</h2>
+    <header class="site-header">
+        <div class="header-content">
+            <img src="assets\picture\kirbySit.png" alt="NO IMG" class="header-img">
+            <h1>Tei's UP GWA Calculator</h1>
+            <p>with kirby.</p>
+        </div>
+    </header>
 
-<!-- Add Course -->
-<form method="post">
-    <input type="text" name="course_code" placeholder="Course Code (e.g. CS 11)" required>
-    <button type="submit" name="add_course">Add Course</button>
-</form>
-<hr>
-
-<!-- Courses -->
-<?php foreach($_SESSION['courses'] as $idx=>$course): ?>
-<div class="course-card">
-    <h3><?= htmlspecialchars($course['code']) ?></h3>
-
-    <!-- Remove Course Form -->
-    <form method="post" style="display:inline;">
-        <input type="hidden" name="remove_course" value="<?= $idx ?>">
-        <button type="submit" class="remove-course-btn">Remove Course ❌</button>
+    <form method="post" style="max-width:700px; width:95%; margin:0 auto 15px; display:flex; gap:10px;">
+        <input type="text" name="course_code" placeholder="Course Code (e.g. CS 11)" required>
+        <button type="submit" name="add_course" class="btn-custom">Add Course<img src="assets\buttons\kirbyAddCourseBtn.png"></button>
     </form>
 
-    <!-- Auto-save form for activities -->
-    <form class="activity-form">
-        <input type="hidden" name="course_index" value="<?= $idx ?>">
-        <p>Units: <input type="number" name="units" value="<?= $course['units'] ?>" min="1"></p>
+    <?php foreach ($_SESSION['courses'] as $idx => $course): ?>
+        <div class="course-card">
+            <div class="course-card-header">
+                <h3 style="color: #ffffff;"><?= htmlspecialchars($course['code']) ?></h3>
+                <form method="post">
+                    <input type="hidden" name="remove_course" value="<?= $idx ?>">
+                    <button class="remove-course-btn" onclick="return confirm('Remove this course?')">Remove<img src="assets\buttons/KNiDL_Hammer_sprite.png"></button>
+                </form>
+            </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Activity</th>
-                    <th>Score</th>
-                    <th>Max</th>
-                    <th>Weight (%)</th>
-                    <th>Raw %</th>
-                    <th>Weighted %</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $activities = $course['activities'];
-                if(empty($activities)) $activities[]=['name'=>'','score'=>0,'max'=>0,'weight'=>0];
-                foreach($activities as $i=>$act):
-                    $score=floatval($act['score']);
-                    $max=floatval($act['max']);
-                    $weight=floatval($act['weight']);
-                    $raw = $max>0?($score/$max)*100:0;
-                    $weighted = ($raw/100)*$weight;
-                ?>
-                <tr>
-                    <td><input type="text" name="activity[]" value="<?= htmlspecialchars($act['name']) ?>"></td>
-                    <td><input type="number" name="score[]" value="<?= $act['score'] ?>"></td>
-                    <td><input type="number" name="max[]" value="<?= $act['max'] ?>"></td>
-                    <td><input type="number" name="weight[]" value="<?= $act['weight'] ?>"></td>
-                    <td><?= number_format($raw,2) ?>%</td>
-                    <td><?= number_format($weighted,2) ?>%</td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+            <form class="activity-form">
+                <input type="hidden" name="course_index" value="<?= $idx ?>">
+                <p>Units: <input class="units-input" type="number" name="units" value="<?= $course['units'] ?>"></p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Score</th>
+                                <th>Max</th>
+                                <th>Weight</th>
+                                <th>Raw %</th>
+                                <th>Weighted %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $acts = $course['activities'] ?: [['name' => '', 'score' => 0, 'max' => 0, 'weight' => 0]];
+                            foreach ($acts as $a):
+                            ?>
+                                <tr>
+                                    <td><input name="activity[]" value="<?= htmlspecialchars($a['name']) ?>"></td>
+                                    <td><input name="score[]" type="number" value="<?= $a['score'] ?>"></td>
+                                    <td><input name="max[]" type="number" value="<?= $a['max'] ?>"></td>
+                                    <td><input name="weight[]" type="number" value="<?= $a['weight'] ?>"></td>
+                                    <td>0%</td>
+                                    <td>0%</td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="weight-bar">
+                    <div class="weight-fill"></div>
+                </div>
+                <p>Total Weight: <strong class="weight-total">0%</strong> <span class="weight-warning">must be 100%</span></p>
+                <p class="final-grade">Final Grade: 0%</p>
 
-        <p>Total Weight: <strong class="weight-total">0%</strong> 
-        <span class="weight-warning">Total weight must be 100%</span></p>
-        <p class="final-grade">Final Grade: 0% → UP Grade: 0</p>
-        <button type="button" class="add-activity-btn">+ Add Activity</button>
-    </form>
+                <button type="button" class="add-activity-btn">+ Add Activity</button>
+            </form>
+        </div>
+    <?php endforeach; ?>
+
+    <div id="gwa-footer">
+    
+    <span id="gwa-text">GWA: —</span>
+    <img id="gwa-reaction" src="assets/reactions/reaction-10.png" alt="Reaction">
 </div>
 
-<?php endforeach; ?>
 
-<!-- Live GWA -->
-<h3 id="live-gwa"></h3>
+    <script>
+        const root = document.documentElement;
+        const toggle = document.getElementById("themeToggle");
 
-<script>
-// Grade conversion
-function convertToUPGrade(percent){
-    if(percent>=97) return 1.00;
-    if(percent>=94.25) return 1.25;
-    if(percent>=91.5) return 1.5;
-    if(percent>=88.75) return 1.75;
-    if(percent>=86) return 2.0;
-    if(percent>=83.25) return 2.25;
-    if(percent>=80.5) return 2.5;
-    if(percent>=77.75) return 2.75;
-    if(percent>=75) return 3.0;
-    if(percent<75) return 4.0;
-    return 5.0;
+
+        function convertToUPGrade(p) {
+            return p >= 97 ? 1 : p >= 94.25 ? 1.25 : p >= 91.5 ? 1.5 : p >= 88.75 ? 1.75 : p >= 86 ? 2 : p >= 83.25 ? 2.25 : p >= 80.5 ? 2.5 : p >= 77.75 ? 2.75 : p >= 75 ? 3 : 4;
+        }
+
+        function updateCourse(form) {
+            let totalWeight = 0,
+                final = 0;
+            form.querySelectorAll("tbody tr").forEach(row => {
+                const s = +row.children[1].firstChild.value || 0;
+                const m = +row.children[2].firstChild.value || 0;
+                const w = +row.children[3].firstChild.value || 0;
+                const raw = m ? (s / m) * 100 : 0;
+                const weighted = raw * w / 100;
+                row.children[4].textContent = raw.toFixed(2) + "%";
+                row.children[5].textContent = weighted.toFixed(2) + "%";
+                totalWeight += w;
+                final += weighted;
+            });
+            form.querySelector(".weight-total").textContent = totalWeight + "%";
+            form.querySelector(".weight-warning").style.display = totalWeight === 100 ? "none" : "inline";
+            const bar = form.querySelector(".weight-fill");
+            bar.style.width = Math.min(totalWeight, 100) + "%";
+            bar.style.background = totalWeight === 100 ? "#22c55e" : "#f59e0b";
+            form.querySelector(".final-grade").textContent = `Final Grade: ${final.toFixed(2)}% → UP Grade: ${convertToUPGrade(final)}`;
+            autoSave(form);
+            updateGWA();
+        }
+
+        function updateReaction(gwa) {
+    const img = document.getElementById("gwa-reaction");
+    let r = 1;
+
+    if (gwa <= 1.49) r = 10;
+    else if (gwa <= 1.99) r = 9;
+    else if (gwa <= 2.24) r = 8;
+    else if (gwa <= 2.49) r = 7;
+    else if (gwa <= 2.74) r = 6;
+    else if (gwa <= 2.99) r = 5;
+    else if (gwa <= 3.24) r = 4;
+    else if (gwa <= 3.49) r = 3;
+    else if (gwa <= 3.74) r = 2;
+
+    img.src = `assets/picture/kirbyGwaReactions/kirbyReaction-${r}.png`;
 }
 
-// Update single row
-function updateRow(row){
-    const score = parseFloat(row.querySelector('input[name="score[]"]').value)||0;
-    const max = parseFloat(row.querySelector('input[name="max[]"]').value)||0;
-    const weight = parseFloat(row.querySelector('input[name="weight[]"]').value)||0;
-    const raw = max>0?(score/max)*100:0;
-    const weighted = (raw/100)*weight;
-    row.cells[4].textContent = raw.toFixed(2)+"%";
-    row.cells[5].textContent = weighted.toFixed(2)+"%";
-}
 
-// Update course totals and auto-save
-function updateCourse(form){
-    const rows = form.querySelectorAll('tbody tr');
-    let totalWeight=0, finalPercent=0;
-    rows.forEach(row=>{
-        updateRow(row);
-        totalWeight += parseFloat(row.querySelector('input[name="weight[]"]').value)||0;
-        finalPercent += parseFloat(row.cells[5].textContent)||0;
-    });
-    form.querySelector('.weight-total').textContent = totalWeight+'%';
-    form.querySelector('.weight-warning').style.display = totalWeight!==100?"inline":"none";
-    form.querySelector('.final-grade').textContent = 'Final Grade: '+finalPercent.toFixed(2)+'% → UP Grade: '+convertToUPGrade(finalPercent).toFixed(2);
+        function updateGWA() {
+    let sum = 0, units = 0;
 
-    updateGWA();
-    autoSave(form);
-}
+    document.querySelectorAll(".activity-form").forEach(f => {
+        const u = +f.querySelector('[name="units"]').value || 3;
+        let fp = 0;
 
-// Live GWA
-function updateGWA(){
-    const forms = document.querySelectorAll('.activity-form'); // only activity forms
-    let totalUnits=0, weightedSum=0;
-    forms.forEach(f=>{
-        const units = parseFloat(f.querySelector('input[name="units"]').value)||3;
-        let finalPercent=0;
-        f.querySelectorAll('tbody tr').forEach(r=>{
-            finalPercent += parseFloat(r.cells[5].textContent)||0;
+        f.querySelectorAll("tbody tr").forEach(r => {
+            fp += +r.children[5].textContent.replace('%', '') || 0;
         });
-        weightedSum += convertToUPGrade(finalPercent)*units;
-        totalUnits += units;
+
+        sum += convertToUPGrade(fp) * u;
+        units += u;
     });
-    document.querySelector('#live-gwa').textContent = totalUnits>0
-        ?"General Weighted Average (GWA): "+(weightedSum/totalUnits).toFixed(2)
-        :"Cannot compute GWA: ensure all courses have total weight.";
-}
 
-// Auto-save course via fetch
-function autoSave(form){
-    const fd = new FormData(form);
-    fd.append("auto_save","1");
-    fetch("",{method:"POST",body:fd});
-}
-
-// Listen to input changes
-document.addEventListener("input", e=>{
-    if(['score[]','max[]','weight[]','units','activity[]'].includes(e.target.name)){
-        updateCourse(e.target.closest("form"));
+    if (!units) {
+        document.getElementById("gwa-text").textContent = "GWA: —";
+        return;
     }
-});
 
-// Add activity button
-document.addEventListener("click", e=>{
-    if(!e.target.classList.contains('add-activity-btn')) return;
-    const form = e.target.closest('form');
-    const tbody = form.querySelector('tbody');
-    const newRow = document.createElement('tr');
-    newRow.innerHTML = `
-        <td><input type="text" name="activity[]" value=""></td>
-        <td><input type="number" name="score[]" value=""></td>
-        <td><input type="number" name="max[]" value=""></td>
-        <td><input type="number" name="weight[]" value=""></td>
-        <td>0.00%</td>
-        <td>0.00%</td>
-    `;
-    tbody.appendChild(newRow);
-    updateCourse(form);
-    newRow.scrollIntoView({behavior:"smooth"});
-});
+    const gwa = (sum / units).toFixed(2);
+    document.getElementById("gwa-text").textContent =
+        "General Weighted Average (GWA): " + gwa;
 
-// Initialize
-document.querySelectorAll('.activity-form').forEach(f=>updateCourse(f));
-</script>
+    updateReaction(parseFloat(gwa));
+}
+
+
+        function autoSave(form) {
+            const fd = new FormData(form);
+            fd.append("auto_save", 1);
+            fetch("", {
+                method: "POST",
+                body: fd
+            });
+        }
+
+        document.addEventListener("input", e => {
+            if (e.target.closest(".activity-form")) updateCourse(e.target.closest(".activity-form"));
+        });
+
+        document.addEventListener("click", e => {
+            if (!e.target.classList.contains("add-activity-btn")) return;
+            e.target.closest("form").querySelector("tbody").insertAdjacentHTML("beforeend", `
+        <tr>
+            <td><input name="activity[]"></td>
+            <td><input name="score[]" type="number"></td>
+            <td><input name="max[]" type="number"></td>
+            <td><input name="weight[]" type="number"></td>
+            <td>0%</td><td>0%</td>
+        </tr>
+    `);
+        });
+
+        document.querySelectorAll(".activity-form").forEach(updateCourse);
+    </script>
 
 </body>
+
 </html>
