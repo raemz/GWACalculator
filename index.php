@@ -81,10 +81,14 @@ if (isset($_POST['auto_save'])) {
         </div>
     </header>
 
-    <form method="post" style="max-width:700px; width:95%; margin:0 auto 15px; display:flex; gap:10px;">
+    <form method="post" style="max-width:1000px; width:95%; margin:0 auto 15px; display:flex; gap:10px;">
         <input type="text" name="course_code" placeholder="Course Code (e.g. CS 11)" required>
-        <button type="submit" name="add_course" class="btn-custom">Add Course<img src="assets/buttons/kirbyAddCourseBtn.png"></button>
+        <button type="submit" name="add_course" class="btn-custom">
+            Add Course
+            <img id="kirby-runner" src="assets/picture/kirbyRun/kirbyRun-1.png" alt="Kirby Running" width="40" height="40">
+        </button>
     </form>
+
 
     <?php foreach ($_SESSION['courses'] as $idx => $course): ?>
         <div class="course-card">
@@ -92,8 +96,12 @@ if (isset($_POST['auto_save'])) {
                 <h3 style="color: #ffffff;"><?= htmlspecialchars($course['code']) ?></h3>
                 <form method="post">
                     <input type="hidden" name="remove_course" value="<?= $idx ?>">
-                    <button class="remove-course-btn" onclick="return confirm('Remove this course?')">Remove<img src="assets/buttons/KNiDL_Hammer_sprite.png"></button>
+                    <button class="remove-course-btn" onclick="return confirm('Remove this course?')">
+                        Remove
+                        <img class="remove-runner" src="assets/picture/kirbyMeteor/meteorKirby-8.png" alt="Remove Animation" width="40" height="40">
+                    </button>
                 </form>
+
             </div>
 
             <form class="activity-form">
@@ -140,10 +148,10 @@ if (isset($_POST['auto_save'])) {
     <?php endforeach; ?>
 
     <div id="gwa-footer">
-    
-    <span id="gwa-text">GWA: —</span>
-    <img id="gwa-reaction" src="assets/picture/kirbyGwaReactions/kirbyReaction-1.png" alt="Reaction">
-</div>
+
+        <span id="gwa-text">GWA: —</span>
+        <img id="gwa-reaction" src="assets/picture/kirbyGwaReactions/kirbyReaction-1.png" alt="Reaction">
+    </div>
 
 
     <script>
@@ -180,49 +188,50 @@ if (isset($_POST['auto_save'])) {
         }
 
         function updateReaction(gwa) {
-    const img = document.getElementById("gwa-reaction");
-    let r = 1;
+            const img = document.getElementById("gwa-reaction");
+            let r = 1;
 
-    if (gwa <= 1.49) r = 10;
-    else if (gwa <= 1.99) r = 9;
-    else if (gwa <= 2.24) r = 8;
-    else if (gwa <= 2.49) r = 7;
-    else if (gwa <= 2.74) r = 6;
-    else if (gwa <= 2.99) r = 5;
-    else if (gwa <= 3.24) r = 4;
-    else if (gwa <= 3.49) r = 3;
-    else if (gwa <= 3.74) r = 2;
+            if (gwa <= 1.49) r = 10;
+            else if (gwa <= 1.99) r = 9;
+            else if (gwa <= 2.24) r = 8;
+            else if (gwa <= 2.49) r = 7;
+            else if (gwa <= 2.74) r = 6;
+            else if (gwa <= 2.99) r = 5;
+            else if (gwa <= 3.24) r = 4;
+            else if (gwa <= 3.49) r = 3;
+            else if (gwa <= 3.74) r = 2;
 
-    img.src = `assets/picture/kirbyGwaReactions/kirbyReaction-${r}.png`;
-}
+            img.src = `assets/picture/kirbyGwaReactions/kirbyReaction-${r}.png`;
+        }
 
 
         function updateGWA() {
-    let sum = 0, units = 0;
+            let sum = 0,
+                units = 0;
 
-    document.querySelectorAll(".activity-form").forEach(f => {
-        const u = +f.querySelector('[name="units"]').value || 3;
-        let fp = 0;
+            document.querySelectorAll(".activity-form").forEach(f => {
+                const u = +f.querySelector('[name="units"]').value || 3;
+                let fp = 0;
 
-        f.querySelectorAll("tbody tr").forEach(r => {
-            fp += +r.children[5].textContent.replace('%', '') || 0;
-        });
+                f.querySelectorAll("tbody tr").forEach(r => {
+                    fp += +r.children[5].textContent.replace('%', '') || 0;
+                });
 
-        sum += convertToUPGrade(fp) * u;
-        units += u;
-    });
+                sum += convertToUPGrade(fp) * u;
+                units += u;
+            });
 
-    if (!units) {
-        document.getElementById("gwa-text").textContent = "GWA: —";
-        return;
-    }
+            if (!units) {
+                document.getElementById("gwa-text").textContent = "GWA: —";
+                return;
+            }
 
-    const gwa = (sum / units).toFixed(2);
-    document.getElementById("gwa-text").textContent =
-        "General Weighted Average (GWA): " + gwa;
+            const gwa = (sum / units).toFixed(2);
+            document.getElementById("gwa-text").textContent =
+                "General Weighted Average (GWA): " + gwa;
 
-    updateReaction(parseFloat(gwa));
-}
+            updateReaction(parseFloat(gwa));
+        }
 
 
         function autoSave(form) {
@@ -233,6 +242,27 @@ if (isset($_POST['auto_save'])) {
                 body: fd
             });
         }
+
+
+        document.addEventListener("input", e => {
+            const row = e.target.closest("tr");
+            if (!row) return;
+
+            const scoreInput = row.querySelector('input[name="score[]"]');
+            const maxInput = row.querySelector('input[name="max[]"]');
+
+            if (e.target === scoreInput || e.target === maxInput) {
+                const score = parseFloat(scoreInput.value) || 0;
+                const max = parseFloat(maxInput.value) || 0;
+
+                if (score > max) scoreInput.value = max;
+            }
+
+
+            const form = e.target.closest(".activity-form");
+            if (form) updateCourse(form);
+        });
+
 
         document.addEventListener("input", e => {
             if (e.target.closest(".activity-form")) updateCourse(e.target.closest(".activity-form"));
@@ -252,10 +282,48 @@ if (isset($_POST['auto_save'])) {
         });
 
         document.querySelectorAll(".activity-form").forEach(updateCourse);
+
+        const kirby = document.getElementById("kirby-runner");
+        const totalFrames = 16;
+        let currentFrame = totalFrames;
+        let kirbyInterval;
+
+        document.querySelector(".btn-custom").addEventListener("mouseenter", () => {
+            kirbyInterval = setInterval(() => {
+                currentFrame--;
+                if (currentFrame < 1) currentFrame = totalFrames;
+                kirby.src = `assets/picture/kirbyRun/kirbyRun-${currentFrame}.png`;
+
+            }, 60);
+        });
+
+        document.querySelector(".btn-custom").addEventListener("mouseleave", () => {
+            clearInterval(kirbyInterval);
+            kirby.src = `assets/picture/kirbyRun/kirbyRun-1.png`; // reset to first frame
+        });
+
+        document.querySelectorAll(".remove-course-btn").forEach(btn => {
+            const img = btn.querySelector(".remove-runner");
+            const totalFrames = 8;
+            let current = 1;
+            let interval;
+
+            btn.addEventListener("mouseenter", () => {
+                interval = setInterval(() => {
+                    current++;
+                    if (current > totalFrames) current = 1;
+                    img.src = `assets/picture/kirbyMeteor/meteorKirby-${current}.png`;
+                }, 250); // slower than add button, adjust if needed
+            });
+
+            btn.addEventListener("mouseleave", () => {
+                clearInterval(interval);
+                img.src = `assets/picture/kirbyMeteor/meteorKirby-1.png`; // reset to first frame
+            });
+        });
     </script>
 
 </body>
 
 
 </html>
-
