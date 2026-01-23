@@ -85,7 +85,14 @@ if (isset($_POST['auto_save'])) {
         <input type="text" name="course_code" placeholder="Course Code (e.g. CS 11)" required>
         <button type="submit" name="add_course" class="btn-custom">
             Add Course
-            <img id="kirby-runner" src="assets/picture/kirbyRun/kirbyRun-1.png" alt="Kirby Running" width="40" height="40">
+            <img
+                class="kirby-hover"
+                src="assets/picture/kirbyRun/kirbyIdle.png"
+                data-static="assets/picture/kirbyRun/kirbyRunningIdle.png"
+                data-gif="assets/picture/kirbyRun/kirbyRunning.gif"
+                alt="Kirby Running"
+                width="40"
+                height="40">
         </button>
     </form>
 
@@ -98,7 +105,15 @@ if (isset($_POST['auto_save'])) {
                     <input type="hidden" name="remove_course" value="<?= $idx ?>">
                     <button class="remove-course-btn" onclick="return confirm('Remove this course?')">
                         Remove
-                        <img class="remove-runner" src="assets/picture/kirbyMeteor/meteorKirby-8.png" alt="Remove Animation" width="40" height="40">
+                        <img
+                            class="kirby-hover"
+                            src="assets/picture/kirbyMeteor/meteorKirbyIdle.png"
+                            data-static="assets/picture/kirbyMeteor/meteorKirbyIdle.png"
+                            data-gif="assets/picture/kirbyMeteor/kirbyMeteor'ed.gif"
+                            alt="Remove Animation"
+                            width="40"
+                            height="40">
+
                     </button>
                 </form>
 
@@ -282,43 +297,15 @@ if (isset($_POST['auto_save'])) {
         });
 
         document.querySelectorAll(".activity-form").forEach(updateCourse);
-
-        const kirby = document.getElementById("kirby-runner");
-        const totalFrames = 16;
-        let currentFrame = totalFrames;
-        let kirbyInterval;
-
-        document.querySelector(".btn-custom").addEventListener("mouseenter", () => {
-            kirbyInterval = setInterval(() => {
-                currentFrame--;
-                if (currentFrame < 1) currentFrame = totalFrames;
-                kirby.src = `assets/picture/kirbyRun/kirbyRun-${currentFrame}.png`;
-
-            }, 60);
-        });
-
-        document.querySelector(".btn-custom").addEventListener("mouseleave", () => {
-            clearInterval(kirbyInterval);
-            kirby.src = `assets/picture/kirbyRun/kirbyRun-1.png`; // reset to first frame
-        });
-
-        document.querySelectorAll(".remove-course-btn").forEach(btn => {
-            const img = btn.querySelector(".remove-runner");
-            const totalFrames = 8;
-            let current = 1;
-            let interval;
+        document.querySelectorAll(".kirby-hover").forEach(img => {
+            const btn = img.closest("button");
 
             btn.addEventListener("mouseenter", () => {
-                interval = setInterval(() => {
-                    current++;
-                    if (current > totalFrames) current = 1;
-                    img.src = `assets/picture/kirbyMeteor/meteorKirby-${current}.png`;
-                }, 250); // slower than add button, adjust if needed
+                img.src = img.dataset.gif;
             });
 
             btn.addEventListener("mouseleave", () => {
-                clearInterval(interval);
-                img.src = `assets/picture/kirbyMeteor/meteorKirby-1.png`; // reset to first frame
+                img.src = img.dataset.static;
             });
         });
     </script>

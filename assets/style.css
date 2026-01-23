@@ -325,30 +325,7 @@ button[type="submit"] {
   object-fit: contain;
 }
 
-.kirby-runner {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  margin-left: 8px;
-
-  background-image: url("assets/picture/kirbyRun/kirbyRunningSprite.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 680px 40px;
-
-  image-rendering: pixelated;
-}
-
-.btn-custom:hover .kirby-runner {
-  animation: kirby-run 0.8s steps(17) infinite;
-  animation-fill-mode: forwards;
-}
-
-@keyframes kirby-run {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: -680px 0;
-  }
+.kirby-hover {
+  pointer-events: none;
+  vertical-align: middle;
 }
