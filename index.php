@@ -87,7 +87,7 @@ if (isset($_POST['auto_save'])) {
             Add Course
             <img
                 class="kirby-hover"
-                src="assets/picture/kirbyRun/kirbyIdle.png"
+                src="assets/picture/kirbyRun/kirbyRunningIdle.png"
                 data-static="assets/picture/kirbyRun/kirbyRunningIdle.png"
                 data-gif="assets/picture/kirbyRun/kirbyRunning.gif"
                 alt="Kirby Running"
