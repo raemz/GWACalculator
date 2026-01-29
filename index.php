@@ -19,6 +19,67 @@ function convertToUPGrade($percent)
     return 4.00;
 }
 
+function getKirbyMessage()
+{
+    $messages = [
+        "I love you, Tei!",
+        "with kirby.",
+        "kirby is watching your grades.",
+        "kirby believes in you!!!",
+        "this is powered by kirby energy.",
+        "kirby calculated this.",
+        "no kirbies were harmed.",
+        "trust the kirby process.",
+        "kirby wants uno grades from u.",
+        "pakain mo na lang kay kirby mga terror prof.",
+        "uno na ba?",
+        "I LOVE YOU BABYYYYY UNO NA YAN!!!!",
+        "can kirby survive UP?",
+        '<a href="https://www.youtube.com/watch?v=fhhz7l86KUU">https://www.youtube.com/watch?v=fhhz7l86KUU</a>',
+        "hala bagsak...?",
+        '<audio controls>
+            <source src="assets/mp3/kirbyHi.mp3" type="audio/mpeg">
+         </audio>',
+         '<audio controls>
+            <source src="assets/mp3/kirk.mp3" type="audio/mpeg">
+         </audio>',
+        '<audio controls>
+            <source src="assets/mp3/kirbyPoyo.mp3" type="audio/mpeg">
+         </audio>',
+        "Kali wants cuddles.",
+        "ay hindi po ako active sa ig, pa-follow na lang po sa github.",
+        "did you ligo?",
+        "kirby will suck up your depression.",
+        "proud of you baby!!!",
+        "make me coffeeeeeeeeeeeee plsssssssssssss",
+        "this randomizer is actually just 7 lines of code.",
+        "make kirby proud.",
+        "MM.. turn it around... WICKED WITCHOIAU:S][23RDHLAGIUSDF",
+        "what if for CS ka talaga.",
+        "kirby wishes you luck.",
+        "kirby is still proud of you kahit singko ka.",
+        "summa na.",
+        "mwa mwa mwa mwa mwa.",
+        "kirby can do your readings!",
+        "bobby is tired of being smushed.",
+        "can we pls cuddle hihihihi.",
+        "what if maging prof mo si kirby.",
+        "kirkby.",
+        "did you know kirby was originally named popopo in development?",
+        "kirby doesnt like gum, cuz he doesnt have teeth, he cant chew. (lol)",
+        "kirby did NOT code this.",
+        "kirby doesnt have a skeleton.",
+        "kirby loves nothing more than eating and sleeping, like you baby ko!",
+        "kirby is a small pink spherical creature with two stubby arms (cute!)",
+        "kirby can eat UP to end all suffering. (then you can study in STI instead hiewehwieh)",
+        "babe what if im dedede and you are kirby in the next life.",
+        "kirby can split into multiple kirbys!!!",
+        '<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/3kLamwtehsN5A7DXXS1fAf?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe><br>HEHE',
+    ];
+
+    return $messages[array_rand($messages)];
+}
+
 if (isset($_POST['add_course'])) {
     $code = trim($_POST['course_code']);
     if ($code !== "") {
@@ -77,7 +138,7 @@ if (isset($_POST['auto_save'])) {
         <div class="header-content">
             <img src="assets/picture/kirbySit.png" alt="NO IMG" class="header-img">
             <h1>Tei's UP GWA Calculator</h1>
-            <p>with kirby.</p>
+            <p class="kirby-message"><?= getKirbyMessage(); ?></p>
         </div>
     </header>
 
